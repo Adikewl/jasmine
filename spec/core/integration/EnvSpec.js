@@ -2490,4 +2490,31 @@ describe("Env integration", function() {
 
     env.execute();
   });
+
+  it('includes useful stack frames in async matcher failures', function(done) {
+    jasmine.getEnv().requirePromises();
+
+    var env = new jasmineUnderTest.Env(),
+        specDone = jasmine.createSpy('specDone');
+
+    env.addReporter({
+      specDone: specDone,
+      jasmineDone: function() {
+        expect(specDone).toHaveBeenCalledWith(jasmine.objectContaining({
+          failedExpectations: [jasmine.objectContaining({
+            stack: jasmine.stringMatching('EnvSpec.js')
+          })]
+        }));
+        done();
+      }
+    });
+
+    env.it('has an async failure', function() {
+      env.addCustomEqualityTester(function() { return true; });
+      var p = Promise.resolve();
+      return env.expect.async(p).toBeRejected();
+    });
+
+    env.execute();
+  });
 });

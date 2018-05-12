@@ -33,6 +33,7 @@ describe('AsyncExpectation', function() {
           passed: true,
           message: '',
           error: undefined,
+          errorForStack: jasmine.any(Error),
           actual: actual
         });
       });
@@ -54,6 +55,7 @@ describe('AsyncExpectation', function() {
           passed: false,
           message: 'Expected a promise to be resolved.',
           error: undefined,
+          errorForStack: jasmine.any(Error),
           actual: actual
         });
       });
@@ -77,6 +79,7 @@ describe('AsyncExpectation', function() {
           passed: true,
           message: '',
           error: undefined,
+          errorForStack: jasmine.any(Error),
           actual: actual
         });
       });
@@ -98,6 +101,7 @@ describe('AsyncExpectation', function() {
           passed: false,
           message: 'Expected a promise to be rejected.',
           error: undefined,
+          errorForStack: jasmine.any(Error),
           actual: actual
         });
       });
@@ -122,6 +126,7 @@ describe('AsyncExpectation', function() {
           passed: true,
           message: '',
           error: undefined,
+          errorForStack: jasmine.any(Error),
           actual: actual
         });
       });
@@ -144,6 +149,7 @@ describe('AsyncExpectation', function() {
           passed: false,
           message: "Expected a promise to be resolved to '' but it was rejected.",
           error: undefined,
+          errorForStack: jasmine.any(Error),
           actual: actual
         });
       });
@@ -166,6 +172,7 @@ describe('AsyncExpectation', function() {
           passed: false,
           message: 'Expected a promise to be resolved to Object({ foo: 42 }) but it was resolved to Object({ foo: 17 }).',
           error: undefined,
+          errorForStack: jasmine.any(Error),
           actual: actual
         });
       });

@@ -29,6 +29,11 @@ getJasmineRequireObj().AsyncExpectation = function(j$) {
       var args = Array.prototype.slice.call(arguments);
       args.unshift(this.actual);
 
+      // Capture the call stack here, before we go async, so that it will
+      // contain frames that are relevant to the user instead of just parts
+      // of Jasmine.
+      var errorForStack = j$.util.errorWithStack();
+
       return compare.apply(self, args).then(function(result) {
         var message;
 
@@ -39,14 +44,12 @@ getJasmineRequireObj().AsyncExpectation = function(j$) {
         args[0] = promiseForMessage;
         message = j$.Expectation.finalizeMessage(self.util, name, self.isNot, args, result);
 
-        // TODO: Is it possible to use the stack trace for where expect.async
-        // was called rather than where the matcher failed? The latter is
-        // useless, containing only Jasmine frames.
         self.addExpectationResult(result.pass, {
           matcherName: name,
           passed: result.pass,
           message: message,
           error: undefined,
+          errorForStack: errorForStack,
           actual: self.actual
         });
       });
