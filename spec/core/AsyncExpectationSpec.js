@@ -31,7 +31,7 @@ describe('AsyncExpectation', function() {
         expect(addExpectationResult).toHaveBeenCalledWith(true, {
           matcherName: 'toBeResolved',
           passed: true,
-          message: 'Expected a promise to be resolved.',
+          message: '',
           error: undefined,
           actual: actual
         });
@@ -75,7 +75,7 @@ describe('AsyncExpectation', function() {
         expect(addExpectationResult).toHaveBeenCalledWith(true, {
           matcherName: 'toBeRejected',
           passed: true,
-          message: 'Expected a promise to be rejected.',
+          message: '',
           error: undefined,
           actual: actual
         });
@@ -120,7 +120,7 @@ describe('AsyncExpectation', function() {
         expect(addExpectationResult).toHaveBeenCalledWith(true, {
           matcherName: 'toBeResolvedTo',
           passed: true,
-          message: 'Expected a promise not to be resolved to Object({ foo: 42 }).',
+          message: '',
           error: undefined,
           actual: actual
         });
@@ -246,7 +246,7 @@ describe('AsyncExpectation', function() {
         expect(addExpectationResult).toHaveBeenCalledWith(true, 
           jasmine.objectContaining({
             passed: true,
-            message: 'Expected a promise not to be resolved.'
+            message: ''
           })
         );
       });

@@ -29,19 +29,23 @@ getJasmineRequireObj().AsyncExpectation = function(j$) {
       var args = Array.prototype.slice.call(arguments);
       args.unshift(this.actual);
 
-      return compare.apply(self, args).then(function(compareResult) {
+      return compare.apply(self, args).then(function(result) {
+        var message;
+
         if (self.isNot) {
-          compareResult.pass = !compareResult.pass;
+          result.pass = !result.pass;
         }
+
+        args[0] = promiseForMessage;
+        message = j$.Expectation.finalizeMessage(self.util, name, self.isNot, args, result);
 
         // TODO: Is it possible to use the stack trace for where expect.async
         // was called rather than where the matcher failed? The latter is
         // useless, containing only Jasmine frames.
-        self.addExpectationResult(compareResult.pass, {
+        self.addExpectationResult(result.pass, {
           matcherName: name,
-          passed: compareResult.pass,
-          message: compareResult.message ||
-            self.util.buildFailureMessage(name, self.isNot, promiseForMessage),
+          passed: result.pass,
+          message: message,
           error: undefined,
           actual: self.actual
         });
