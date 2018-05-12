@@ -1,10 +1,12 @@
 getJasmineRequireObj().Suite = function(j$) {
   function Suite(attrs) {
+    var self = this;
     this.env = attrs.env;
     this.id = attrs.id;
     this.parentSuite = attrs.parentSuite;
     this.description = attrs.description;
     this.expectationFactory = attrs.expectationFactory;
+    this.asyncExpectationFactory = attrs.asyncExpectationFactory;
     this.expectationResultFactory = attrs.expectationResultFactory;
     this.throwOnExpectationFailure = !!attrs.throwOnExpectationFailure;
 
@@ -31,11 +33,15 @@ getJasmineRequireObj().Suite = function(j$) {
       failedExpectations: [],
       deprecationWarnings: []
     };
-  }
 
-  Suite.prototype.expect = function(actual) {
-    return this.expectationFactory(actual, this);
-  };
+    this.expect = function(actual) {
+      return self.expectationFactory(actual, self);
+    };
+
+    this.expect.async = function(actual) {
+      return self.asyncExpectationFactory(actual, self);
+    };
+  }
 
   Suite.prototype.getFullName = function() {
     var fullName = [];

@@ -1,6 +1,8 @@
 getJasmineRequireObj().Spec = function(j$) {
   function Spec(attrs) {
+    var self = this;
     this.expectationFactory = attrs.expectationFactory;
+    this.asyncExpectationFactory = attrs.asyncExpectationFactory;
     this.resultCallback = attrs.resultCallback || function() {};
     this.id = attrs.id;
     this.description = attrs.description || '';
@@ -38,6 +40,15 @@ getJasmineRequireObj().Spec = function(j$) {
       deprecationWarnings: [],
       pendingReason: ''
     };
+
+
+    this.expect = function(actual) {
+      return this.expectationFactory(actual, this);
+    };
+
+    this.expect.async = function(actual) {
+      return self.asyncExpectationFactory(actual, self);
+    };
   }
 
   Spec.prototype.addExpectationResult = function(passed, data, isError) {
@@ -51,10 +62,6 @@ getJasmineRequireObj().Spec = function(j$) {
         throw new j$.errors.ExpectationFailed();
       }
     }
-  };
-
-  Spec.prototype.expect = function(actual) {
-    return this.expectationFactory(actual, this);
   };
 
   Spec.prototype.execute = function(onComplete, excluded) {

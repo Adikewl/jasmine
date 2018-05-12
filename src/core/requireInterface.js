@@ -226,6 +226,11 @@ getJasmineRequireObj().interface = function(jasmine, env) {
     jasmine: jasmine
   };
 
+  // TODO jsdocs
+  jasmineInterface.expect.async = function(actual) {
+    return env.expect.async(actual);
+  };
+
   /**
    * Add a custom equality tester for the current scope of specs.
    *

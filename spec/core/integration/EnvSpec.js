@@ -2415,4 +2415,79 @@ describe("Env integration", function() {
 
     env.execute();
   });
+
+  it('supports async matchers', function(done) {
+    jasmine.getEnv().requirePromises();
+
+    var env = new jasmineUnderTest.Env(),
+        specDone = jasmine.createSpy('specDone'),
+        suiteDone = jasmine.createSpy('suiteDone');
+
+    env.addReporter({
+      specDone: specDone,
+      suiteDone: suiteDone,
+      jasmineDone: function(result) {
+        expect(result.failedExpectations).toEqual([jasmine.objectContaining({
+            message: 'Expected a promise to be rejected.'
+        })]);
+
+        expect(specDone).toHaveBeenCalledWith(jasmine.objectContaining({
+          description: 'has an async failure',
+          failedExpectations: [jasmine.objectContaining({
+            message: 'Expected a promise to be rejected.'
+          })]
+        }));
+
+        expect(suiteDone).toHaveBeenCalledWith(jasmine.objectContaining({
+          description: 'a suite',
+          failedExpectations: [jasmine.objectContaining({
+            message: 'Expected a promise to be rejected.'
+          })]
+        }));
+
+        done();
+      }
+    });
+
+    function fail(innerDone) {
+      var resolve;
+      var p = new Promise(function(res, rej) { resolve = res });
+      env.expect.async(p).toBeRejected().then(innerDone);
+      resolve();
+    }
+
+    env.afterAll(fail);
+    env.describe('a suite', function() {
+      env.afterAll(fail);
+      env.it('has an async failure', fail);
+    });
+
+    env.execute();
+  });
+
+  it('provides custom equality testers to async matchers', function(done) {
+    jasmine.getEnv().requirePromises();
+
+    var env = new jasmineUnderTest.Env(),
+        specDone = jasmine.createSpy('specDone');
+
+    env.addReporter({
+      specDone: specDone,
+      jasmineDone: function() {
+        expect(specDone).toHaveBeenCalledWith(jasmine.objectContaining({
+          description: 'has an async failure',
+          failedExpectations: []
+        }));
+        done();
+      }
+    });
+
+    env.it('has an async failure', function() {
+      env.addCustomEqualityTester(function() { return true; });
+      var p = Promise.resolve('something');
+      return env.expect.async(p).toBeResolvedTo('something else');
+    });
+
+    env.execute();
+  });
 });

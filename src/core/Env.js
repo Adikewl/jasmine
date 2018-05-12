@@ -116,6 +116,19 @@ getJasmineRequireObj().Env = function(j$) {
       }
     };
 
+    var asyncExpectationFactory = function(actual, spec) {
+      return j$.AsyncExpectation.factory({
+        util: j$.matchersUtil,
+        customEqualityTesters: runnableResources[spec.id].customEqualityTesters,
+        actual: actual,
+        addExpectationResult: addExpectationResult
+      });
+
+      function addExpectationResult(passed, result) {
+        return spec.addExpectationResult(passed, result);
+      }
+    };
+
     var defaultResourcesForRunnable = function(id, parentRunnableId) {
       var resources = {spies: [], customEqualityTesters: [], customMatchers: {}, customSpyStrategies: {}};
 
@@ -238,6 +251,7 @@ getJasmineRequireObj().Env = function(j$) {
       id: getNextSuiteId(),
       description: 'Jasmine__TopLevel__Suite',
       expectationFactory: expectationFactory,
+      asyncExpectationFactory: asyncExpectationFactory,
       expectationResultFactory: expectationResultFactory
     });
     defaultResourcesForRunnable(topSuite.id);
@@ -512,6 +526,7 @@ getJasmineRequireObj().Env = function(j$) {
         description: description,
         parentSuite: currentDeclarationSuite,
         expectationFactory: expectationFactory,
+        asyncExpectationFactory: asyncExpectationFactory,
         expectationResultFactory: expectationResultFactory,
         throwOnExpectationFailure: throwOnExpectationFailure
       });
@@ -605,6 +620,7 @@ getJasmineRequireObj().Env = function(j$) {
         id: getNextSpecId(),
         beforeAndAfterFns: beforeAndAfterFns(suite),
         expectationFactory: expectationFactory,
+        asyncExpectationFactory: asyncExpectationFactory,
         resultCallback: specResultCallback,
         getSpecName: function(spec) {
           return getSpecName(spec, suite);
@@ -684,6 +700,14 @@ getJasmineRequireObj().Env = function(j$) {
       }
 
       return currentRunnable().expect(actual);
+    };
+
+    this.expect.async = function(actual) {
+      if (!currentRunnable()) {
+        throw new Error('\'expect.async\' was used when there was no current spec, this could be because an asynchronous test timed out');
+      }
+
+      return currentRunnable().expect.async(actual);
     };
 
     this.beforeEach = function(beforeEachFunction, timeout) {
