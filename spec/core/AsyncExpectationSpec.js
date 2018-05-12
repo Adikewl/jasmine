@@ -120,7 +120,7 @@ describe('AsyncExpectation', function() {
         expect(addExpectationResult).toHaveBeenCalledWith(true, {
           matcherName: 'toBeResolvedTo',
           passed: true,
-          message: 'Expected a promise to be resolved to Object({ foo: 42 }).',
+          message: 'Expected a promise not to be resolved to Object({ foo: 42 }).',
           error: undefined,
           actual: actual
         });
@@ -171,6 +171,26 @@ describe('AsyncExpectation', function() {
       });
     });
 
+    it('builds its message correctly when negated', function() {
+      jasmine.getEnv().requirePromises();
+
+      var addExpectationResult = jasmine.createSpy('addExpectationResult'),
+        expectation = jasmineUnderTest.AsyncExpectation.factory({
+          util: jasmineUnderTest.matchersUtil,
+          actual: Promise.resolve(true),
+          addExpectationResult: addExpectationResult
+        });
+
+      return expectation.not.toBeResolvedTo(true).then(function() {
+        expect(addExpectationResult).toHaveBeenCalledWith(false,
+          jasmine.objectContaining({
+            passed: false,
+            message: 'Expected a promise not to be resolved to true.'
+          })
+        );
+      });
+    });
+
     it('supports custom equality testers', function() {
       jasmine.getEnv().requirePromises();
 
@@ -185,6 +205,50 @@ describe('AsyncExpectation', function() {
       return expectation.toBeResolvedTo('expected').then(function() {
         expect(addExpectationResult).toHaveBeenCalledWith(true,
           jasmine.objectContaining({passed: true}));
+      });
+    });
+  });
+  
+  describe('#not', function() {
+    it('converts a pass to a fail', function() {
+      jasmine.getEnv().requirePromises();
+
+      var addExpectationResult = jasmine.createSpy('addExpectationResult'),
+        actual = Promise.resolve(),
+        expectation = jasmineUnderTest.AsyncExpectation.factory({
+          util: jasmineUnderTest.matchersUtil,
+          actual: actual,
+          addExpectationResult: addExpectationResult
+        });
+
+      return expectation.not.toBeResolved().then(function() {
+        expect(addExpectationResult).toHaveBeenCalledWith(false, 
+          jasmine.objectContaining({
+            passed: false,
+            message: 'Expected a promise not to be resolved.'
+          })
+        );
+      });
+    });
+
+    it('converts a fail to a pass', function() {
+      jasmine.getEnv().requirePromises();
+
+      var addExpectationResult = jasmine.createSpy('addExpectationResult'),
+        actual = Promise.reject(),
+        expectation = jasmineUnderTest.AsyncExpectation.factory({
+          util: jasmineUnderTest.matchersUtil,
+          actual: actual,
+          addExpectationResult: addExpectationResult
+        });
+
+      return expectation.not.toBeResolved().then(function() {
+        expect(addExpectationResult).toHaveBeenCalledWith(true, 
+          jasmine.objectContaining({
+            passed: true,
+            message: 'Expected a promise not to be resolved.'
+          })
+        );
       });
     });
   });
